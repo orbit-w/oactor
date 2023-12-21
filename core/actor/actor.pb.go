@@ -26,6 +26,8 @@ type PID struct {
 	Address   string `protobuf:"bytes,1,opt,name=Address,proto3" json:"Address,omitempty"`
 	Id        string `protobuf:"bytes,2,opt,name=Id,proto3" json:"Id,omitempty"`
 	RequestId uint32 `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+
+	p IProcess
 }
 
 func (m *PID) Reset()         { *m = PID{} }

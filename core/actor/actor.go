@@ -14,6 +14,7 @@ const (
 
 type OActor struct {
 	state    atomic.Int32
+	deadFlag atomic.Uint32 // 0 | 1, 1:代表已进入立即注销流程
 	behavior IActorBehavior
 	mailbox  mailbox.IMailbox //bounded mailbox
 }
@@ -33,6 +34,7 @@ func (oa *OActor) Stop() {
 
 // Shutdown will stop actor immediately regardless of existing user messages in mailbox.
 func (oa *OActor) Shutdown() {
+	oa.die()
 	oa.mailbox.PushSystemMsg(&SystemStop{})
 }
 
@@ -66,4 +68,12 @@ func (oa *OActor) handleStop() {
 func (oa *OActor) finalizeStop() {
 	oa.InvokeMsg(stoppedMsg)
 	oa.state.Store(stateStopped)
+}
+
+func (oa *OActor) die() {
+	oa.deadFlag.Store(1)
+}
+
+func (oa *OActor) dead() bool {
+	return oa.deadFlag.Load() == 1
 }
