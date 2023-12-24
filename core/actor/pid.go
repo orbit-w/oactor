@@ -14,7 +14,7 @@ func NewPID(address, id string) *PID {
 }
 
 func (pid *PID) SendMessage(message interface{}) {
-	if pid.Address != engine.localAddress() {
+	if !pid.IsLocal() {
 		//remote
 		return
 	}
@@ -27,16 +27,14 @@ func (pid *PID) raf() IProcess {
 		if l, ok := (*p).(*OActor); ok && l.dead() {
 			atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&pid.p)), nil)
 		} else {
-			return *puukj
+			return *p
 		}
 	}
 
-	ref, exists := engine.Register().Get(pid)
+	ref, exists := FindProcess(pid)
 	if exists {
 		atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(&pid.p)), unsafe.Pointer(&ref))
-		return ref
 	}
-
 	return ref
 }
 
@@ -46,4 +44,24 @@ func (pid *PID) Equal(other *PID) bool {
 	}
 
 	return pid.Id == other.Id && pid.Address == other.Address && pid.RequestId == other.RequestId
+}
+
+func (pid *PID) IsLocal() bool {
+	return pid.Address != gEngine.localAddress()
+}
+
+func FindProcess(pid *PID) (IProcess, bool) {
+	if !pid.IsLocal() {
+		if ref, ok := GEngine().remoteHandler(pid); ok {
+			return ref, false
+		}
+		return GEngine().deadLetterProcess, false
+	}
+
+	ref, exists := gEngine.Register().Get(pid)
+	if exists {
+		return ref, exists
+	}
+
+	return GEngine().deadLetterProcess, false
 }

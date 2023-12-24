@@ -1,21 +1,23 @@
 package actor
 
 type Engine struct {
-	address  string
-	nodeId   string
-	register *Register
+	address           string
+	nodeId            string
+	register          *Register
+	deadLetterProcess IProcess
+	remoteHandler     func(*PID) (IProcess, bool)
 }
 
 func GEngine() *Engine {
-	return engine
+	return gEngine
 }
 
-var engine *Engine
+var gEngine *Engine
 
 func NewEngine(conf *Config) *Engine {
-	engine = new(Engine)
-	engine.register = NewRegister(128)
-	return engine
+	gEngine = new(Engine)
+	gEngine.register = NewRegister(128)
+	return gEngine
 }
 
 func (e *Engine) Register() *Register {
