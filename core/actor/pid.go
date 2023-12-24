@@ -53,7 +53,7 @@ func (pid *PID) IsLocal() bool {
 func FindProcess(pid *PID) (IProcess, bool) {
 	if !pid.IsLocal() {
 		if ref, ok := GEngine().remoteHandler(pid); ok {
-			return ref, false
+			return ref, true
 		}
 		return GEngine().deadLetterProcess, false
 	}
