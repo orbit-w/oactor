@@ -24,7 +24,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type PID struct {
 	Address   string `protobuf:"bytes,1,opt,name=Address,proto3" json:"Address,omitempty"`
-	Id        string `protobuf:"bytes,2,opt,name=Id,proto3" json:"Id,omitempty"`
+	Id        string `protobuf:"bytes,2,opt,name=NodeId,proto3" json:"NodeId,omitempty"`
 	RequestId uint32 `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 
 	p IProcess
@@ -246,7 +246,7 @@ func (m *PID) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {

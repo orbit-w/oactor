@@ -19,11 +19,11 @@ type OActor struct {
 	mailbox  mailbox.IMailbox //bounded mailbox
 }
 
-func (oa *OActor) Cast(msg any) {
+func (oa *OActor) Cast(_ PID, msg any) {
 	oa.mailbox.Push(msg)
 }
 
-func (oa *OActor) CastSystem(msg any) {
+func (oa *OActor) CastSystem(_ PID, msg any) {
 	oa.mailbox.PushSystemMsg(msg)
 }
 
