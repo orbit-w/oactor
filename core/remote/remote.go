@@ -2,8 +2,8 @@ package remote
 
 import (
 	"github.com/orbit-w/golib/bases/packet"
+	"github.com/orbit-w/golib/modules/transport"
 	"github.com/orbit-w/oactor/core/actor"
-	"github.com/orbit-w/oactor/core/transport"
 	"sync"
 )
 
@@ -22,6 +22,10 @@ func (r *Remote) SendMsg(pid *actor.PID, msg any) error {
 	pack := r.encode(pid, msg)
 	defer pack.Return()
 	return r.connMap.Get(pid).Write(pack)
+}
+
+func (r *Remote) Call(msg any) (any, error) {
+	return nil, nil
 }
 
 func (r *Remote) encode(pid *actor.PID, msg any) packet.IPacket {

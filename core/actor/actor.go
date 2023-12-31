@@ -23,6 +23,10 @@ func (oa *OActor) Cast(msg any) {
 	oa.mailbox.Push(msg)
 }
 
+func (oa *OActor) Call(msg any) (any, error) {
+	return nil, nil
+}
+
 func (oa *OActor) CastSystem(msg any) {
 	oa.mailbox.PushSystemMsg(msg)
 }

@@ -6,6 +6,7 @@ package actor
 // Let the caller use secure messaging methods to operate the target GenServer
 type IProcess interface {
 	Cast(msg any)
+	Call(msg any) (any, error)
 	CastSystem(msg any)
 	Stop()
 }
