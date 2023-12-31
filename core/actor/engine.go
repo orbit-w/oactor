@@ -24,6 +24,10 @@ func (e *Engine) Register() *Register {
 	return e.register
 }
 
+func (e *Engine) GetNodeId() string {
+	return e.nodeId
+}
+
 func (e *Engine) localAddress() string {
 	return e.address
 }

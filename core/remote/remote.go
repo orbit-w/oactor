@@ -1,41 +1,57 @@
 package remote
 
 import (
-	"github.com/orbit-w/golib/bases/packet"
+	"github.com/gogo/protobuf/proto"
 	"github.com/orbit-w/golib/modules/transport"
 	"github.com/orbit-w/oactor/core/actor"
 	"sync"
 )
 
 type Remote struct {
-	e       *actor.Engine
+	engine  *actor.Engine
 	nodeId  string
-	pid     *actor.PID
 	connMap *ConnMap
+	codec   Codec
 }
 
-func (r *Remote) Id() string {
-	return r.pid.Id
+var remote *Remote
+
+func NewRemote(e *actor.Engine) *Remote {
+	remote = &Remote{
+		engine: e,
+		nodeId: e.GetNodeId(),
+	}
+
+	remote.connMap = NewConnMap(remote)
+	return remote
 }
 
-func (r *Remote) SendMsg(pid *actor.PID, msg any) error {
-	pack := r.encode(pid, msg)
+func (r *Remote) NodeId() string {
+	return r.nodeId
+}
+
+func (r *Remote) SendMsg(pid *actor.PID, msg proto.Message) error {
+	pack, err := r.codec.Encode(pid, msg)
+	if err != nil {
+		pack.Return()
+		return err
+	}
 	defer pack.Return()
 	return r.connMap.Get(pid).Write(pack)
-}
-
-func (r *Remote) Call(msg any) (any, error) {
-	return nil, nil
-}
-
-func (r *Remote) encode(pid *actor.PID, msg any) packet.IPacket {
-	return nil
 }
 
 type ConnMap struct {
 	rw      sync.RWMutex
 	remote  *Remote
 	connMap map[string]transport.IConn
+}
+
+func NewConnMap(_remote *Remote) *ConnMap {
+	return &ConnMap{
+		rw:      sync.RWMutex{},
+		remote:  _remote,
+		connMap: make(map[string]transport.IConn),
+	}
 }
 
 func (rc *ConnMap) Get(t *actor.PID) transport.IConn {
@@ -58,7 +74,7 @@ func (rc *ConnMap) Load(t *actor.PID) transport.IConn {
 
 	conn := transport.DialWithOps(t.Address, &transport.DialOption{
 		RemoteNodeId:  t.Id,
-		CurrentNodeId: rc.remote.Id(),
+		CurrentNodeId: rc.remote.NodeId(),
 		DisconnectHandler: func(nodeId string) {
 			rc.rw.Lock()
 			delete(rc.connMap, nodeId)

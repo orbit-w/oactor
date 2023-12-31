@@ -21,6 +21,7 @@ func (pid *PID) SendMessage(message interface{}) {
 	pid.raf().Cast(message)
 }
 
+// TODO：如果actor 发生物理结点迁移，需要重新获取PID
 func (pid *PID) raf() IProcess {
 	p := (*IProcess)(atomic.LoadPointer((*unsafe.Pointer)(unsafe.Pointer(&pid.p))))
 	if p != nil {
