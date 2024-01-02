@@ -30,8 +30,8 @@ func (r *Remote) NodeId() string {
 	return r.nodeId
 }
 
-func (r *Remote) SendMsg(pid *actor.PID, msg proto.Message) error {
-	pack, err := r.codec.Encode(pid, msg)
+func (r *Remote) SendMsg(pid, sender *actor.PID, msg proto.Message) error {
+	pack, err := r.codec.Encode(pid, sender, msg)
 	if err != nil {
 		pack.Return()
 		return err

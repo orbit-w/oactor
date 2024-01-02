@@ -1,0 +1,10 @@
+syntax = "proto3";
+package remote;
+option go_package = "github.com/orbit-w/oactor/core/remote";
+import "core/actor/actor.proto";
+
+message MessageEnvelope {
+  actor.PID Target = 1; //receiver
+  actor.PID Sender = 2;
+  bytes Data = 4;
+}

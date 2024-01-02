@@ -7,9 +7,7 @@ type Process struct {
 }
 
 func (r *Process) Cast(pid actor.PID, msg any) {
-	request := RpcRequest{
-		message: msg,
-	}
+
 }
 
 func (r *Process) CastSystem(pid actor.PID, msg any) {
