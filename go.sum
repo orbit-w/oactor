@@ -10,6 +10,8 @@ github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBF
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/orbit-w/golib v1.0.10 h1:MuE+GGh8zK+kd5F9cnpJKlOh8Ml7AJMaUgl/lXfSCDg=
 github.com/orbit-w/golib v1.0.10/go.mod h1:E1qEV/1n1SbaAoGh+GHXn5EF0gnm+3cwM4kh0bs1xZs=
+github.com/orbit-w/mmrpc v1.0.2 h1:zQCGcjrTCp9K/c05mz8GmTBVqTWO0wMvg7FBb+q3IvU=
+github.com/orbit-w/mmrpc v1.0.2/go.mod h1:QQ+9ETIZaT109BqEiHbKUNixILOp1FDmQg5JwehGv6c=
 github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HDbW65HOY=
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/philhofer/fwd v1.1.1/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=

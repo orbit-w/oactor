@@ -4,6 +4,7 @@ option go_package = "";
 
 message PID {
   string Address = 1;
-  string Id = 2;
-  uint32 request_id = 3;
+  string NodeId = 2;
+  string Id = 3;
+  uint32 request_id = 4;
 }
