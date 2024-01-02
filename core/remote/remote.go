@@ -2,8 +2,9 @@ package remote
 
 import (
 	"github.com/gogo/protobuf/proto"
+	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
-	"github.com/orbit-w/oactor/core/transport"
+	"log"
 	"sync"
 )
 
@@ -37,24 +38,24 @@ func (r *Remote) SendMsg(pid, sender *actor.PID, msg proto.Message) error {
 		return err
 	}
 	defer pack.Return()
-	return r.connMap.Get(pid).Write(pack)
+	return r.connMap.Get(pid).Shoot(pack.Data())
 }
 
 type ConnMap struct {
 	rw      sync.RWMutex
 	remote  *Remote
-	connMap map[string]transport.IConn
+	connMap map[string]mmrpc.IClient
 }
 
 func NewConnMap(_remote *Remote) *ConnMap {
 	return &ConnMap{
 		rw:      sync.RWMutex{},
 		remote:  _remote,
-		connMap: make(map[string]transport.IConn),
+		connMap: make(map[string]mmrpc.IClient),
 	}
 }
 
-func (rc *ConnMap) Get(t *actor.PID) transport.IConn {
+func (rc *ConnMap) Get(t *actor.PID) mmrpc.IClient {
 	rc.rw.RLock()
 	if conn, ok := rc.connMap[t.Id]; ok {
 		rc.rw.RUnlock()
@@ -65,23 +66,27 @@ func (rc *ConnMap) Get(t *actor.PID) transport.IConn {
 	return rc.Load(t)
 }
 
-func (rc *ConnMap) Load(t *actor.PID) transport.IConn {
+func (rc *ConnMap) Load(t *actor.PID) mmrpc.IClient {
 	rc.rw.Lock()
-	if conn, ok := rc.connMap[t.Id]; ok {
+	defer func() {
 		rc.rw.Unlock()
+	}()
+	if conn, ok := rc.connMap[t.Id]; ok {
 		return conn
 	}
 
-	conn := transport.DialWithOps(t.Address, &transport.DialOption{
-		RemoteNodeId:  t.Id,
-		CurrentNodeId: rc.remote.NodeId(),
+	conn, err := mmrpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, mmrpc.DialOption{
 		DisconnectHandler: func(nodeId string) {
 			rc.rw.Lock()
 			delete(rc.connMap, nodeId)
 			rc.rw.Unlock()
 		},
 	})
+	if err != nil {
+		log.Fatalln("rpc dial failed: ", err.Error())
+		return nil
+	}
+
 	rc.connMap[t.Id] = conn
-	rc.rw.Unlock()
 	return conn
 }

@@ -18,7 +18,7 @@ func (pid *PID) SendMessage(message interface{}) {
 		//remote
 		return
 	}
-	pid.raf().Cast(message)
+	pid.raf().Cast(pid, message)
 }
 
 // TODO：如果actor 发生物理结点迁移，需要重新获取PID

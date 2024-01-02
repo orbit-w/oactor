@@ -5,7 +5,8 @@ package actor
 // for tracing and error reporting
 // Let the caller use secure messaging methods to operate the target GenServer
 type IProcess interface {
-	Cast(pid PID, msg any)
-	CastSystem(pid PID, msg any)
+	Cast(pid *PID, msg any)
+	CastSystem(pid *PID, msg any)
+	Call(pid *PID, msg any) (any, error)
 	Stop()
 }
