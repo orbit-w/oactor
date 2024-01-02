@@ -34,3 +34,7 @@ func (c Codec) Encode(pid, sender *actor.PID, msg proto.Message) (packet.IPacket
 	writer.Write(pack)
 	return writer, err
 }
+
+func (c Codec) Decode(me *MessageEnvelope, data []byte, reader packet.IPacket) error {
+	return nil
+}

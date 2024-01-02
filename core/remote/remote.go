@@ -75,7 +75,7 @@ func (rc *ConnMap) Load(t *actor.PID) mmrpc.IClient {
 		return conn
 	}
 
-	conn, err := mmrpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, mmrpc.DialOption{
+	conn, err := mmrpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, &mmrpc.DialOption{
 		DisconnectHandler: func(nodeId string) {
 			rc.rw.Lock()
 			delete(rc.connMap, nodeId)
