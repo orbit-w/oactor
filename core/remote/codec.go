@@ -6,17 +6,16 @@ import (
 	"github.com/orbit-w/oactor/core/actor"
 )
 
-type Codec struct {
-}
+type Codec struct{}
 
-func (c Codec) Encode(pid, sender *actor.PID, msg proto.Message) (packet.IPacket, error) {
-	writer := packet.Writer()
+func (c Codec) Encode(pid, sender *actor.PID, msg any) (packet.IPacket, error) {
 	var (
-		body []byte
-		err  error
+		body   []byte
+		err    error
+		writer = packet.Writer()
 	)
 	if msg != nil {
-		body, err = proto.Marshal(msg)
+		body, err = Interpreter().Marshal(msg)
 		if err != nil {
 			return nil, err
 		}

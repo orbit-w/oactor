@@ -1,7 +1,7 @@
 package remote
 
 import (
-	"github.com/gogo/protobuf/proto"
+	"context"
 	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
 	"log"
@@ -17,6 +17,13 @@ type Remote struct {
 
 var remote *Remote
 
+func setRemote(r *Remote) {
+	if r == nil {
+		panic("remote invalid")
+	}
+	remote = r
+}
+
 func NewRemote(e *actor.Engine) *Remote {
 	remote = &Remote{
 		engine: e,
@@ -31,7 +38,7 @@ func (r *Remote) NodeId() string {
 	return r.nodeId
 }
 
-func (r *Remote) SendMsg(pid, sender *actor.PID, msg proto.Message) error {
+func (r *Remote) SendMsg(pid, sender *actor.PID, msg any) error {
 	pack, err := r.codec.Encode(pid, sender, msg)
 	if err != nil {
 		pack.Return()
@@ -39,6 +46,16 @@ func (r *Remote) SendMsg(pid, sender *actor.PID, msg proto.Message) error {
 	}
 	defer pack.Return()
 	return r.connMap.Get(pid).Shoot(pack.Data())
+}
+
+func (r *Remote) Call(ctx context.Context, pid, sender *actor.PID, msg any) ([]byte, error) {
+	pack, err := r.codec.Encode(pid, sender, msg)
+	if err != nil {
+		pack.Return()
+		return nil, err
+	}
+	defer pack.Return()
+	return r.connMap.Get(pid).Call(ctx, pack.Data())
 }
 
 type ConnMap struct {
