@@ -1,5 +1,7 @@
 package actor
 
+import "context"
+
 // IProcess A process implemented using this module has a
 // standard set of interface functions and includes functionality
 // for tracing and error reporting
@@ -7,6 +9,6 @@ package actor
 type IProcess interface {
 	Cast(pid *PID, msg any)
 	CastSystem(pid *PID, msg any)
-	Call(pid *PID, msg any) (any, error)
+	Call(ctx context.Context, pid *PID, msg any) (any, error)
 	Stop()
 }
