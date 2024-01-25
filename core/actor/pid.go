@@ -48,7 +48,7 @@ func (pid *PID) Equal(other *PID) bool {
 }
 
 func (pid *PID) IsLocal() bool {
-	return pid.Address != gEngine.localAddress()
+	return pid.Address != gEngine.LocalAddress()
 }
 
 func FindProcess(pid *PID) (IProcess, bool) {

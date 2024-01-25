@@ -4,7 +4,7 @@ type Engine struct {
 	address           string
 	nodeId            string
 	register          *Register
-	deadLetterProcess IProcess
+	deadLetterProcess IProcess //死信处理器
 	remoteHandler     func(*PID) (IProcess, bool)
 }
 
@@ -28,6 +28,6 @@ func (e *Engine) GetNodeId() string {
 	return e.nodeId
 }
 
-func (e *Engine) localAddress() string {
+func (e *Engine) LocalAddress() string {
 	return e.address
 }

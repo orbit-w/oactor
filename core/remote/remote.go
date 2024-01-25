@@ -4,15 +4,16 @@ import (
 	"context"
 	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
-	"log"
-	"sync"
+	"go.uber.org/zap"
 )
 
 type Remote struct {
 	engine  *actor.Engine
 	nodeId  string
+	address string
 	connMap *ConnMap
 	codec   Codec
+	logger  *zap.Logger
 }
 
 var remote *Remote
@@ -31,6 +32,11 @@ func NewRemote(e *actor.Engine) *Remote {
 	}
 
 	remote.connMap = NewConnMap(remote)
+	if err := mmrpc.Serve(e.GetNodeId(), func(req mmrpc.IRequest) error {
+		return handleReq(remote, req)
+	}); err != nil {
+
+	}
 	return remote
 }
 
@@ -39,71 +45,38 @@ func (r *Remote) NodeId() string {
 }
 
 func (r *Remote) SendMsg(pid, sender *actor.PID, msg any) error {
-	pack, err := r.codec.Encode(pid, sender, msg)
+	req, err := r.codec.EncodeReq(pid, sender, msg)
 	if err != nil {
-		pack.Return()
+		req.Return()
 		return err
 	}
-	defer pack.Return()
-	return r.connMap.Get(pid).Shoot(pack.Data())
+	defer req.Return()
+	return r.connMap.Get(pid).Shoot(req.Data())
 }
 
-func (r *Remote) Call(ctx context.Context, pid, sender *actor.PID, msg any) ([]byte, error) {
-	pack, err := r.codec.Encode(pid, sender, msg)
+func (r *Remote) Call(ctx context.Context, pid, sender *actor.PID, msg any) (any, error) {
+	req, err := r.codec.EncodeReq(pid, sender, msg)
 	if err != nil {
-		pack.Return()
+		req.Return()
 		return nil, err
 	}
-	defer pack.Return()
-	return r.connMap.Get(pid).Call(ctx, pack.Data())
-}
-
-type ConnMap struct {
-	rw      sync.RWMutex
-	remote  *Remote
-	connMap map[string]mmrpc.IClient
-}
-
-func NewConnMap(_remote *Remote) *ConnMap {
-	return &ConnMap{
-		rw:      sync.RWMutex{},
-		remote:  _remote,
-		connMap: make(map[string]mmrpc.IClient),
-	}
-}
-
-func (rc *ConnMap) Get(t *actor.PID) mmrpc.IClient {
-	rc.rw.RLock()
-	if conn, ok := rc.connMap[t.Id]; ok {
-		rc.rw.RUnlock()
-		return conn
-	}
-	rc.rw.RUnlock()
-
-	return rc.Load(t)
-}
-
-func (rc *ConnMap) Load(t *actor.PID) mmrpc.IClient {
-	rc.rw.Lock()
-	defer func() {
-		rc.rw.Unlock()
-	}()
-	if conn, ok := rc.connMap[t.Id]; ok {
-		return conn
-	}
-
-	conn, err := mmrpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, &mmrpc.DialOption{
-		DisconnectHandler: func(nodeId string) {
-			rc.rw.Lock()
-			delete(rc.connMap, nodeId)
-			rc.rw.Unlock()
-		},
-	})
+	defer req.Return()
+	in, err := r.connMap.Get(pid).Call(ctx, req.Data())
 	if err != nil {
-		log.Fatalln("rpc dial failed: ", err.Error())
-		return nil
+		return nil, err
 	}
 
-	rc.connMap[t.Id] = conn
-	return conn
+	return r.codec.DecodeResp(in)
+}
+
+func handleReq(r *Remote, in mmrpc.IRequest) error {
+	req, err := newRequest(r, in)
+
+	if err != nil {
+		r.logger.Error("decode req failed", zap.Error(err))
+		return err
+	}
+
+	doRequest(req)
+	return nil
 }

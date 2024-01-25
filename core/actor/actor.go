@@ -1,6 +1,7 @@
 package actor
 
 import (
+	"context"
 	"github.com/orbit-w/golib/modules/mailbox"
 	"sync/atomic"
 )
@@ -23,7 +24,7 @@ func (oa *OActor) Cast(_ *PID, msg any) {
 	oa.mailbox.Push(msg)
 }
 
-func (oa *OActor) Call(_ *PID, msg any) (any, error) {
+func (oa *OActor) Call(ctx context.Context, pid *PID, msg any) (any, error) {
 	return nil, nil
 }
 

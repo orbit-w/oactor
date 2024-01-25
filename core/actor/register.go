@@ -39,7 +39,7 @@ func (r *Register) Get(pid *PID) (IProcess, bool) {
 func (r *Register) Set(uuid string, p IProcess) (*PID, bool) {
 	b := r.getBucket(uuid)
 	return &PID{
-		Address: r.engine.localAddress(),
+		Address: r.engine.LocalAddress(),
 		Id:      uuid,
 	}, b.SetIfAbsent(uuid, p)
 }

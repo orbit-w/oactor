@@ -1,62 +1,23 @@
 package remote
 
 import (
-	"errors"
 	"github.com/gogo/protobuf/proto"
 	"github.com/orbit-w/golib/bases/packet"
 	"github.com/orbit-w/oactor/core/actor"
 )
 
-// ICodec defines the interface that decode/encode payload.
-type ICodec interface {
-	Encode(msg any) ([]byte, error)
-	Decode(buf []byte, r any) error
-}
-
-var (
-	defaultCodec ICodec
-)
-
-func init() {
-	//目前只支持 proto 协议
-	if defaultCodec == nil {
-		defaultCodec = new(ProtoCodec)
-	}
-}
-
-type ProtoCodec struct{}
-
-func (pi *ProtoCodec) Encode(msg any) ([]byte, error) {
-	m, ok := msg.(proto.Message)
-	if !ok {
-		return nil, errors.New("message not proto.Message")
-	}
-
-	body, err := proto.Marshal(m)
-	return body, err
-}
-
-func (pi *ProtoCodec) Decode(buf []byte, r any) error {
-	m, ok := r.(proto.Message)
-	if !ok {
-		return errors.New("message not proto.Message")
-	}
-	return proto.Unmarshal(buf, m)
-}
-
 type Codec struct{}
 
-func (c Codec) Encode(pid, sender *actor.PID, msg any) (packet.IPacket, error) {
+// EncodeReq 编码
+func (c Codec) EncodeReq(pid, sender *actor.PID, msg any) (packet.IPacket, error) {
 	var (
 		body   []byte
-		err    error
 		writer = packet.Writer()
+		err    error
 	)
+
 	if msg != nil {
-		body, err = defaultCodec.Encode(msg)
-		if err != nil {
-			return nil, err
-		}
+		body, err = Serialize(msg)
 	}
 
 	me := MessageEnvelope{
@@ -72,6 +33,35 @@ func (c Codec) Encode(pid, sender *actor.PID, msg any) (packet.IPacket, error) {
 	return writer, err
 }
 
-func (c Codec) Decode(me *MessageEnvelope, data []byte, reader packet.IPacket) error {
-	return nil
+func (c Codec) EncodeResp(msg any) (packet.IPacket, error) {
+	if msg == nil {
+		return nil, nil
+	}
+	body, err := Serialize(msg)
+	return packet.Reader(body), err
+}
+
+func (c Codec) DecodeReq(in []byte) (target, sender *actor.PID, msg any, err error) {
+	me := new(MessageEnvelope)
+	if err = proto.Unmarshal(in, me); err != nil {
+		return nil, nil, nil, err
+	}
+	target = me.Target
+	sender = me.Sender
+	if me.Data == nil {
+		return nil, nil, nil, nil
+	}
+
+	if len(me.Data) > 0 {
+		msg, err = Deserialize(me.Data)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+	}
+	return
+}
+
+// DecodeResp 解码
+func (c Codec) DecodeResp(in []byte) (any, error) {
+	return Deserialize(in)
 }
