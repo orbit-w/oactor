@@ -29,6 +29,8 @@ type PID struct {
 	NodeId    string `protobuf:"bytes,2,opt,name=NodeId,proto3" json:"NodeId,omitempty"`
 	Id        string `protobuf:"bytes,3,opt,name=Id,proto3" json:"Id,omitempty"`
 	RequestId uint32 `protobuf:"varint,4,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+
+	p IProcess
 }
 
 func (x *PID) Reset() {

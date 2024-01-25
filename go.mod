@@ -8,6 +8,7 @@ require (
 	github.com/orbit-w/mmrpc v1.0.4
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/zeebo/xxh3 v1.0.2
+	go.uber.org/zap v1.26.0
 	google.golang.org/protobuf v1.32.0
 )
 
@@ -15,6 +16,5 @@ require (
 	github.com/Workiva/go-datastructures v1.1.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	go.uber.org/zap v1.26.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

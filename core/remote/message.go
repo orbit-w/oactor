@@ -1,9 +1,7 @@
 package remote
 
 import (
-	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
-	"go.uber.org/zap"
 	"sync"
 )
 
@@ -14,6 +12,7 @@ const (
 
 type IRequest interface {
 	Response(msg any) error
+	Return()
 }
 
 type IResponse interface {
@@ -30,44 +29,36 @@ var (
 
 type Request struct {
 	Category int8
-	remote   *Remote
 	Sender   *actor.PID
 	Receiver *actor.PID
 	Resp     IResponse
 	Message  any
 }
 
-func newRequest(r *Remote, in mmrpc.IRequest) (*Request, error) {
+func newRequest() *Request {
 	v := reqPool.Get()
 	req := v.(*Request)
-	target, sender, msg, err := r.codec.DecodeReq(in.Data())
-	if err != nil {
-		r.logger.Error("decode req failed", zap.Error(err))
-		return nil, err
-	}
-
-	req.Category = in.Category()
-	req.Sender = sender
-	req.Receiver = target
-	req.Message = msg
-	req.Resp = in
-	return req, nil
+	return req
 }
 
-func doRequest(req *Request) {
+func (req *Request) Do() {
 	req.Receiver.SendMessage(req)
 }
 
 func (req *Request) Response(msg any) error {
-	pack, err := req.remote.codec.EncodeResp(msg)
-	defer func() {
-		if pack != nil {
-			pack.Return()
-		}
-	}()
+	data, err := Serialize(msg)
 	if err != nil {
 		return err
 	}
 
-	return req.Resp.Response(pack.Data())
+	return req.Resp.Response(data)
+}
+
+func (req *Request) Return() {
+	req.Sender = nil
+	req.Receiver = nil
+	req.Message = nil
+	req.Resp = nil
+	req.Category = 0
+	reqPool.Put(req)
 }
