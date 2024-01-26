@@ -53,12 +53,19 @@ func (pid *PID) IsLocal() bool {
 
 func FindProcess(pid *PID) (IProcess, bool) {
 	if !pid.IsLocal() {
-		if ref, ok := GEngine().remoteHandler(pid); ok {
-			return ref, true
+		e := GEngine()
+		//actor 远程通信前置条件检查
+		//例如：远端 actor 活跃检查
+		for i := range e.remoteHandler {
+			h := e.remoteHandler[i]
+			if ref, ok := h(pid); ok {
+				return ref, ok
+			}
 		}
-		return GEngine().deadLetterProcess, false
+		return e.deadLetterProcess, false
 	}
 
+	//本地消息通信
 	ref, exists := gEngine.Register().Get(pid)
 	if exists {
 		return ref, exists

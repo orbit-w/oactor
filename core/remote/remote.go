@@ -32,6 +32,8 @@ func NewRemote(e *actor.Engine) (*Remote, error) {
 	}
 
 	remote.connMap = NewConnMap(remote)
+	e.RegRemoteHandler(remote.newRemoteProcess)
+
 	if err := mmrpc.Serve(e.GetNodeId(), func(req mmrpc.IRequest) error {
 		return handleReq(remote, req)
 	}); err != nil {
@@ -63,6 +65,11 @@ func (r *Remote) Call(ctx context.Context, pid, sender *actor.PID, msg any) (any
 	}
 
 	return Deserialize(in)
+}
+
+func (r *Remote) newRemoteProcess(self *actor.PID) (actor.IProcess, bool) {
+	p := newProcess(self, r)
+	return p, true
 }
 
 func handleReq(r *Remote, in mmrpc.IRequest) error {
