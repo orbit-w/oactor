@@ -1,8 +1,8 @@
 package remote
 
 import (
-	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
+	"github.com/orbit-w/rpc_transport/rpc"
 	"log"
 	"sync"
 )
@@ -10,18 +10,18 @@ import (
 type ConnMap struct {
 	rw      sync.RWMutex
 	remote  *Remote
-	connMap map[string]mmrpc.IClient
+	connMap map[string]rpc.IClient
 }
 
 func NewConnMap(_remote *Remote) *ConnMap {
 	return &ConnMap{
 		rw:      sync.RWMutex{},
 		remote:  _remote,
-		connMap: make(map[string]mmrpc.IClient),
+		connMap: make(map[string]rpc.IClient),
 	}
 }
 
-func (rc *ConnMap) Get(t *actor.PID) mmrpc.IClient {
+func (rc *ConnMap) Get(t *actor.PID) rpc.IClient {
 	rc.rw.RLock()
 	if conn, ok := rc.connMap[t.Id]; ok {
 		rc.rw.RUnlock()
@@ -32,7 +32,7 @@ func (rc *ConnMap) Get(t *actor.PID) mmrpc.IClient {
 	return rc.Load(t)
 }
 
-func (rc *ConnMap) Load(t *actor.PID) mmrpc.IClient {
+func (rc *ConnMap) Load(t *actor.PID) rpc.IClient {
 	rc.rw.Lock()
 	defer func() {
 		rc.rw.Unlock()
@@ -41,7 +41,7 @@ func (rc *ConnMap) Load(t *actor.PID) mmrpc.IClient {
 		return conn
 	}
 
-	conn, err := mmrpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, &mmrpc.DialOption{
+	conn, err := rpc.Dial(rc.remote.NodeId(), t.NodeId, t.Address, &rpc.DialOption{
 		DisconnectHandler: func(nodeId string) {
 			rc.rw.Lock()
 			delete(rc.connMap, nodeId)

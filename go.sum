@@ -11,8 +11,8 @@ github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBF
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
 github.com/orbit-w/golib v1.0.11-0.20240125050248-609b70ad2079 h1:pJyh4834z5gkGIEGMRyv+GoHokGc1fA+bsjo1zCxhec=
 github.com/orbit-w/golib v1.0.11-0.20240125050248-609b70ad2079/go.mod h1:b7uA1Q8FBw4rvx2k7t+acZlQ30sNz3tIQv8JHq6zKoI=
-github.com/orbit-w/mmrpc v1.0.4 h1:/m0UwOwkhJM/URYdMT1+aWzko3RJbLu/LeVjdIqfMv0=
-github.com/orbit-w/mmrpc v1.0.4/go.mod h1:8gav9sGXwHnd59YVSFJ8XgASaFVQfb4ZY7KXg+dzHww=
+github.com/orbit-w/rpc_transport v1.0.5-0.20240126111427-e9a47a7fc78d h1:06BJRdaQvJZ9ZfuBhYCzQwlHhAvaI/B2xtcouVmKLk4=
+github.com/orbit-w/rpc_transport v1.0.5-0.20240126111427-e9a47a7fc78d/go.mod h1:C99AG3Hl57zaPKZ8nNRZ40OC5FuKZfm+bFWyThrsR3k=
 github.com/orcaman/concurrent-map v1.0.0 h1:I/2A2XPCb4IuQWcQhBhSwGfiuybl/J0ev9HDbW65HOY=
 github.com/orcaman/concurrent-map v1.0.0/go.mod h1:Lu3tH6HLW3feq74c2GC+jIMS/K2CFcDWnWD9XkenwhI=
 github.com/philhofer/fwd v1.1.1/go.mod h1:gk3iGcWd9+svBvR0sR+KPcfE+RNWozjowpeBVG3ZVNU=

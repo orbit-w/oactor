@@ -2,8 +2,8 @@ package remote
 
 import (
 	"context"
-	mmrpc "github.com/orbit-w/mmrpc/rpc"
 	"github.com/orbit-w/oactor/core/actor"
+	"github.com/orbit-w/rpc_transport/rpc"
 	"go.uber.org/zap"
 )
 
@@ -34,7 +34,7 @@ func NewRemote(e *actor.Engine) (*Remote, error) {
 	remote.connMap = NewConnMap(remote)
 	e.RegRemoteHandler(remote.newRemoteProcess)
 
-	if err := mmrpc.Serve(e.GetNodeId(), func(req mmrpc.IRequest) error {
+	if err := rpc.Serve(e.GetNodeId(), func(req rpc.IRequest) error {
 		return handleReq(remote, req)
 	}); err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (r *Remote) newRemoteProcess(self *actor.PID) (actor.IProcess, bool) {
 	return p, true
 }
 
-func handleReq(r *Remote, in mmrpc.IRequest) error {
+func handleReq(r *Remote, in rpc.IRequest) error {
 	req := newRequest()
 
 	var err error
