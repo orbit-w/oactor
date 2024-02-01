@@ -6,6 +6,8 @@ import (
 )
 
 // NewPID returns a new instance of the PID struct.
+// Pid ( Process Id ) 消息投递的入口, 一个可序列化的标识符，作为消息投递的入口，将消息发送到参与者的邮箱；
+// Pid 可以低消耗的序列化供远程传输
 func NewPID(address, id string) *PID {
 	return &PID{
 		Address: address,

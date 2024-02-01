@@ -17,5 +17,8 @@ type (
 var (
 	stoppingMsg = &Stopping{}
 	stoppedMsg  = &Stopped{}
-	stopMsg     = &Stop{}
+
+	//系统级消息
+	stopMsg    = &SystemStop{}
+	startedMsg = &SystemStarted{}
 )

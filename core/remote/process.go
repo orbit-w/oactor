@@ -28,8 +28,7 @@ func (r *Process) CastSystem(_ *actor.PID, msg any) {
 }
 
 func (r *Process) Call(ctx context.Context, pid *actor.PID, msg any) (any, error) {
-	r.remote.Call(ctx, pid, r.self, msg)
-	return nil, nil
+	return r.remote.Call(ctx, pid, r.self, msg)
 }
 
 func (r *Process) Stop() {

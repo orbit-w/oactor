@@ -32,30 +32,30 @@ func (oa *OActor) CastSystem(_ *PID, msg any) {
 	oa.mailbox.PushSystemMsg(msg)
 }
 
-// Stop will tell actor to stop after processing current user messages in mailbox
+// SystemStopMsg will tell actor to stop after processing current user messages in mailbox
 func (oa *OActor) Stop() {
-	oa.mailbox.Push(stopMsg)
+	oa.mailbox.PushSystemMsg(stopMsg)
 }
 
 // Shutdown will stop actor immediately regardless of existing user messages in mailbox.
 func (oa *OActor) Shutdown() {
 	oa.die()
-	oa.mailbox.PushSystemMsg(&SystemStop{})
+	//oa.mailbox.PushSystemMsg(stopMsg)
 }
 
 func (oa *OActor) InvokeMsg(message any) {
-	switch message.(type) {
-	case *Stop:
-		oa.Shutdown()
-	default:
 
-	}
 }
 
 func (oa *OActor) InvokeSysMsg(message any) {
 	switch message.(type) {
 	case *SystemStop:
+		//立即停止，不会消耗掉后续的消息
 		oa.handleStop()
+	case *SystemStarted:
+		//激活驱动消息，是Actor在生成或重新启动后收到的第一条消息。
+		//如果需要为参与者设置初始状态（例如从数据库加载数据），需要在IActorBehavior中处理SystemStarted消息
+		oa.InvokeMsg(message)
 	}
 }
 
@@ -67,10 +67,6 @@ func (oa *OActor) handleStop() {
 
 	oa.InvokeMsg(stoppingMsg)
 
-	oa.finalizeStop()
-}
-
-func (oa *OActor) finalizeStop() {
 	oa.InvokeMsg(stoppedMsg)
 	oa.state.Store(stateStopped)
 }
