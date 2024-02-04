@@ -2,9 +2,10 @@ package actor
 
 // System messages
 type (
-	SystemStop    struct{}
-	SystemStarted struct{}
-	SystemRestart struct{}
+	SystemStop         struct{}
+	SystemGracefulStop struct{}
+	SystemStarted      struct{}
+	SystemRestart      struct{}
 )
 
 // User auto receive messages
@@ -19,6 +20,7 @@ var (
 	stoppedMsg  = &Stopped{}
 
 	//系统级消息
-	stopMsg    = &SystemStop{}
-	startedMsg = &SystemStarted{}
+	stopMsg      = &SystemStop{}
+	gracefulStop = &SystemGracefulStop{}
+	startedMsg   = &SystemStarted{}
 )
