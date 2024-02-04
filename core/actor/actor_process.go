@@ -2,6 +2,7 @@ package actor
 
 import (
 	"context"
+	"errors"
 	"github.com/orbit-w/golib/modules/mailbox"
 	"sync/atomic"
 )
@@ -15,8 +16,24 @@ func (ap *ActorProcess) Cast(_ *PID, msg any) {
 	ap.mailbox.Push(msg)
 }
 
-func (ap *ActorProcess) Call(ctx context.Context, pid *PID, msg any) (any, error) {
-	return nil, nil
+func (ap *ActorProcess) Call(ctx context.Context, _ *PID, msg any) (any, error) {
+	req := GetRequest()
+	req.msg = msg
+	req.category = Call
+
+	ap.mailbox.Push(req)
+
+	select {
+	case resp := <-req.Done():
+		req.Return()
+		return resp.msg, resp.err
+	case <-ctx.Done():
+		err := ctx.Err()
+		if errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
+			return nil, nil
+		}
+		return nil, err
+	}
 }
 
 func (ap *ActorProcess) CastSystem(_ *PID, msg any) {

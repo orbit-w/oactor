@@ -1,5 +1,5 @@
 package actor
 
 type IActorBehavior interface {
-	HandleMsg(ctx any)
+	HandleCall(ctx any) (any, error)
 }
