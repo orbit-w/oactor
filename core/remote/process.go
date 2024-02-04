@@ -17,20 +17,24 @@ func newProcess(pid *actor.PID, _remote *Remote) *Process {
 	}
 }
 
-func (r *Process) Cast(pid *actor.PID, msg any) {
-	_ = r.remote.SendMsg(pid, r.self, msg)
+func (p *Process) Cast(pid *actor.PID, msg any) {
+	_ = p.remote.SendMsg(pid, p.self, msg)
 }
 
-func (r *Process) CastSystem(_ *actor.PID, msg any) {
+func (p *Process) CastSystem(_ *actor.PID, msg any) {
 	switch msg.(type) {
 
 	}
 }
 
-func (r *Process) Call(ctx context.Context, pid *actor.PID, msg any) (any, error) {
-	return r.remote.Call(ctx, pid, r.self, msg)
+func (p *Process) Call(ctx context.Context, pid *actor.PID, msg any) (any, error) {
+	return p.remote.Call(ctx, pid, p.self, msg)
 }
 
-func (r *Process) Stop() {
+func (p *Process) Stop() {
+
+}
+
+func (p *Process) GracefulStop() {
 
 }

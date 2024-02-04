@@ -10,4 +10,5 @@ type IProcess interface {
 	CastSystem(pid *PID, msg any)
 	Call(ctx context.Context, pid *PID, msg any) (any, error)
 	Stop()
+	GracefulStop()
 }
